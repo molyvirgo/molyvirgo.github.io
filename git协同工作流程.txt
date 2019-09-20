@@ -1,0 +1,63 @@
+1 管理者 在码云上创建仓库
+2 管理者 关联远程仓库和本地仓库
+	[在本地执行以下命令]
+	git init
+	git remote add origin https://gitee.com/zqpm01/test2.git
+	git push origin master
+
+	touch .gitignore 
+	git add .gitignore  [git rm -f .gitignore]
+	git commit -m 'create .gitignore'
+	git push origin master:master
+
+3 邀请团队成员 
+	发送邀请链接给团队成员[必须拥有码云账号]
+
+4 团队成员接受邀请下载代码到个人电脑
+	git clone https://gitee.com/zqpm01/test2.git
+
+	git branch -a
+	git branch shahem01
+	git checkout shahem01
+	[编写 新内容]	[git checkout -- 文件名 回滚工作区内容]
+	git add 文件名 [git checkout --文件名 回滚暂存区的内容]
+	git commit -m 'add something new' [git reset logID 回滚本地仓库到指定版本]
+	git push orign shahem01:m01
+
+5 管理者拉取最新代码
+	git fetch 
+	git branch -a [主要查看是否有新的分支]
+	git branch m01
+	git checkout m01
+	git merge origin/m01
+	git branch zqp [创建自己的工作分支]
+	git checkout zqp
+	git merge m01 [检查团队成员代码后 合并到自己的分支]
+	[若有冲突 手动修正]
+	git push origin shahezqp:zqp
+	git checkout master
+	git merge zqp
+	git push origin master :master[master分支为稳定分支]
+
+6 团队成员 拉取最新代码
+	git fetch 
+	git branch -a
+	git checkout master
+	git merge origin/master
+	git checkout shahem01
+	git merge master
+	[开始工作]
+	git  add 文件名
+	git commit -m 'add something new today'
+	git push origin shahem01:m01
+
+7 管理员 再次拉取合并代码
+
+
+
+
+
+
+
+
+
