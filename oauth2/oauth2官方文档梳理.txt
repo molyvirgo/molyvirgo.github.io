@@ -1,0 +1,70 @@
+oauth2基于http,与oauth1无关系
+
+roles
+{
+    resource owner,
+    resource server,
+    client,
+    authorization server 
+
+
+}
+Protocol Flow    
+{ 
++--------+                               +---------------+     
+|        |--(A)- Authorization Request ->|   Resource    |     
+|        |                               |     Owner     |     
+|        |<-(B)-- Authorization Grant ---|               |     
+|        |                               +---------------+    
+|        |
+|        |                               +---------------+     
+|        |--(C)-- Authorization Grant -->| Authorization |     
+| Client |                               |     Server    |     
+|        |<-(D)----- Access Token -------|               |     
+|        |                               +---------------+     
+|        |
+|        |                               +---------------+     
+|        |--(E)----- Access Token ------>|    Resource   |     
+|        |                               |     Server    |     
+|        |<-(F)--- Protected Resource ---|               |     
++--------+                               +---------------+
+
+}
+
+Authorization Grant{
+    [获取 access token 的凭证]
+    可以有四种方式
+    Authorization Code :[the client   directs the resource owner to an authorization server (via its   user-agent as defined in [RFC2616]), which in turn directs the   resource owner back to the client with the authorization code.]
+    implicit grant :[the client is issued an access token directly instead of issuing the client   an authorization code]
+    resource owner password credentials :[The resource owner password credentials (i.e., username and password)   can be used directly as an authorization grant to obtain an access   token]
+    Client Credentials :[The client credentials (or other forms of client authentication) can   be used as an authorization grant when the authorization scope is   limited to the protected resources under the control of the client,   or to protected resources previously arranged with the authorization   server.]
+}
+
+Access Token{
+    [获取资源]
+}
+Refresh token{
+    [Refresh tokens are credentials used to obtain access tokens.  Refresh   tokens are issued to the client by the authorization server and are   used to obtain a new access token when the current access token   becomes invalid or expires, or to obtain additional access tokens   with identical or narrower scope]
+
+    +--------+                                           +---------------+  
+    |        |--(A)------- Authorization Grant --------->|               |  
+    |        |                                           |               |  
+    |        |<-(B)----------- Access Token -------------|               |  
+    |        |               & Refresh Token             |               |  
+    |        |                                           |               |  
+    |        |                            +----------+   |               |  
+    |        |--(C)---- Access Token ---->|          |   |               |  
+    |        |                            |          |   |               |  
+    |        |<-(D)- Protected Resource --| Resource |   | Authorization |  
+    | Client |                            |  Server  |   |     Server    |  
+    |        |--(E)---- Access Token ---->|          |   |               |  
+    |        |                            |          |   |               |  
+    |        |<-(F)- Invalid Token Error -|          |   |               |  
+    |        |                            +----------+   |               |  
+    |        |                                           |               |  
+    |        |--(G)----------- Refresh Token ----------->|               |  
+    |        |                                           |               |  
+    |        |<-(H)----------- Access Token -------------|               |  
+    +--------+           & Optional Refresh Token        +---------------+
+
+}
