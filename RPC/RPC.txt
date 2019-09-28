@@ -1,0 +1,3 @@
+RPC[Remote Procedure Call]
+RPC的设计由Client，Client stub，Network ，Server stub，Server构成。 其中Client就是用来调用服务的，Cient stub是用来把调用的方法和参数序列化的（因为要在网络中传输，必须要把对象转变成字节），Network用来传输这些信息到Server stub， Server stub用来把这些信息反序列化的，Server就是服务的提供者，最终调用的就是Server提供的方法。
+RPC 调用分 同步调用，异步调用[是否等待服务器端执行完成并返回结果]

@@ -1,0 +1,237 @@
+
+基本：{
+		SPA即不刷新页面[用户感觉不到浏览器在刷新]
+		vue 为了实现SPA，那如何切换页面呢？vue通过组件渲染页面，vue-router切换组件的展示。
+		导航： <router-link to="/user">/user</router-link> === <a href='/user'>/user</a>
+		视图： <router-view></router-view> 用于渲染组件
+}
+
+
+路由传参:{
+
+/user/moly  -> /user/:name   this.route.params.name== $route.params.name == moly
+/user?name=moly   this.route.query.name== $route.query.name== moly
+/user#123	this.route.hash=$route.hash == 123
+}
+嵌套路由:{
+
+const router = new VueRouter({
+  routes: [
+    { path: '/user/:id', component: User,
+      children: [
+        // UserHome will be rendered inside User's <router-view>
+        // when /user/:id is matched
+        { path: '', component: UserHome },
+        // UserProfile will be rendered inside User's <router-view>
+        // when /user/:id/profile is matched
+        { path: 'profile', component: UserProfile },
+
+       
+        { path: 'posts', component: UserPosts }
+      ]
+    }
+  ]
+})
+
+}
+
+编程式导航:{
+
+点击 <route-link :to="/user"> 时，=== this.route.push("/user",onComplete(),onAbort()) == this.route.replace('/user',onComplete(),onAbort())
+[replace method  not push a record to browser's history  abort：流产夭折===失败的意思  好词！]
+this.route.go(number) 前进 number 步骤
+}
+
+命名视图:{
+
+{const router = new VueRouter({
+  mode: 'history',
+  routes: [
+    { path: '/settings',
+      // You could also have named views at tho top
+      component: UserSettings,
+      children: [{
+      	path: 'emails',
+        components: {
+            moly: UserEmailsSubscriptions
+        }
+      }, {
+      	path: 'profile',
+        components: {
+        	default: UserProfile,
+          moly: UserProfilePreview
+        }
+      }]
+    }
+  ]
+})
+
+}
+原因：当一个路由下需要渲染多个 视图时 就需要用到 视图命名
+<router-view name="moly" class="us__content us__content--helper"/>
+
+}
+
+命名路由:{
+
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/user/:userId',
+      name: 'user',
+      component: User
+    }
+  ]
+})
+原因：方便API操作
+比如：
+const router = new VueRouter({
+  routes: [
+    { path: '/a', redirect: { name: 'foo' }}
+  ]
+})
+
+}
+路由组件之间传值:{
+
+使用 prop属性[
+<template>
+  <div>
+    <h2 class="hello">Hello {{name}} {{ $attrs }}</h2>
+  </div>
+</template>
+
+<script>
+
+export default {
+  props: {
+    name: {
+      type: String,
+      default: 'Vue!'
+    }
+  }
+}
+</script>
+------------
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import Hello from './Hello.vue'
+
+Vue.use(VueRouter)
+
+function dynamicPropsFn (route) {
+  const now = new Date()
+  return {
+    name: (now.getFullYear() + parseInt(route.params.years)) + '!'
+  }
+}
+
+const router = new VueRouter({
+  mode: 'history',
+  base: __dirname,
+  routes: [
+    { path: '/', component: Hello }, // No props, no nothing
+    { path: '/hello/:name', component: Hello, props: true }, // Pass route.params to props
+    { path: '/static', component: Hello, props: { name: 'world' }}, // static values
+    { path: '/dynamic/:years', component: Hello, props: dynamicPropsFn }, // custom logic for mapping between route and props
+    { path: '/attrs', component: Hello, props: { name: 'attrs' }}
+  ]
+})
+
+new Vue({
+  router,
+  template: `
+    <div id="app">
+      <h1>Route props</h1>
+      <ul>
+        <li><router-link to="/">/</router-link></li>
+        <li><router-link to="/hello/you">/hello/you</router-link></li>
+        <li><router-link to="/static">/static</router-link></li>
+        <li><router-link to="/dynamic/1">/dynamic/1</router-link></li>
+        <li><router-link to="/attrs">/attrs</router-link></li>
+      </ul>
+      <router-view class="view" foo="123"></router-view>
+    </div>
+  `
+}).$mount('#app')
+
+]
+}，
+hash model & history model:{.
+	window{
+			window.location.hash{
+				表示锚点 代表网页中的一个位置[http://www.xxx.com/#moly 表示页面滚动到中 id='moly'|| name='moly'的元素位置上]
+				改变锚点值不会向服务器发送请求，会保存在浏览器的浏览记录中
+				window.onhashchange(HashChangeEvent)监控hash变化
+			}
+			window.history{
+				保存客户对浏览器的会话历史访问记录
+				window.history.back()
+				window.history.forward()
+				window.history.go()
+
+				history.pushState() & history.replaceState() 用于保存 数据状态，在back(),forward(),go() 时 才会触动 window.onpopstate
+				[理解英语词意] 
+
+			}
+
+			通过 改变 hash 和 调用 history.pushState()&history.replaceState() 实现 改变url 但不访问服务器 [所谓的前端路由]
+	}
+
+	vue{
+			hash model{
+					其实就是window.location.hash
+					通过 window.onhashchange(HashChangeEvent) 改变视图渲染
+					特点：不会向服务器访问
+
+					vue 修改 hash 实现 url改变 页面不刷新[不请求服务器的需求]
+					vue 修改 hash 切换 组件 是怎么做到的 ？
+			}
+			history model{
+					vue 使用 history.pushState()&history.replaceState()  实现url改变 页面不刷新[不请求服务器的需求]
+					vue  根据 url  切换组件 是怎么做到的？
+
+				
+			}
+
+	}
+
+}
+导航守卫:{
+	就是路由改变时触发的函数[请求参数改变时 也触发函数]
+	全局路由触发函数:{
+
+			router.beforeEach((to,from,next)=>{
+
+					//next(false) 代表拒绝跳转
+					//next({path:'/moly'})代表跳转到指定的路由 从头重新触发函数
+			})
+			router.beforeResolve((to, from, next) => {
+					//在 beforeEach之后
+					//同样可以手动改变路由
+
+			})
+			router.afterEach((to,from)=>{
+					//扫尾工作
+			}）
+	}，
+	局部路由触发函数:{
+			[在 router对象中 为 个别组件定制路由监听函数]
+			beforeEnter(to,from,next)
+	}
+	组件内路由触发函数:{
+			[进入，更新，离开组件时 触发函数，在组件定义时 定义]
+			beforeRouterEnter(to,from,next)
+			beforeRouteUpdate(to,from,next)
+			beforeRouteLeave(to,from,next)
+	}
+	触发顺序:{
+			进入路由时[/moly]:
+						beforeEach -> beforeEnter -> beforeRouteEnter -> beforeResolve -> afterEach
+			路由更新时[/moly?name=zqp or /moly#1]:
+					beforeEach -> beforeRouteUpdate -> beforeResolve -> afterEach
+			[规律: 由大到小 由粗到细 先整体后局部]
+	}
+
+
+}
