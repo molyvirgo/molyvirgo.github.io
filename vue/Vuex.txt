@@ -1,0 +1,131 @@
+访问vuex state:{
+    const app = new Vue({
+        el: '#app',
+        // 把 store 对象提供给 “store” 选项，这可以把 store 的实例注入所有的子组件
+        store,
+        components: { Counter },
+        template: `
+            <div class="app">
+            <counter></counter>
+            </div>
+        `
+    })
+
+    使用 vuex 的 getter:{
+        个人认为 这是 复用state 以及减少重复在组件编写 computed attribute
+        const store = new Vuex.Store({
+            state: {
+                todos: [
+                { id: 1, text: '...', done: true },
+                { id: 2, text: '...', done: false }
+                ]
+            },
+            getters: {
+                doneTodos: state => {
+                    return state.todos.filter(todo => todo.done)
+                },
+                doneTodosCount: (state, getters) => {
+                    return getters.doneTodos.length
+                },
+                getTodoById: (state) => (id) => {
+                    return state.todos.find(todo => todo.id === id)
+                }
+            }
+        })
+
+        访问
+            使用 getters的 属性
+            this.$store.getters.doneTodos [会缓存计算结果， state.todos 不改变 不会重新计算]
+            使用 getters的 方法
+            this.$store.getters.getTodoById(1)
+    },
+
+    使用 组件的 计算属性:{
+        访问 state 数量少时,使用this.$store.state.xxx
+        访问 state 数量多时，使用 mapState function
+        使用 mapGetters function
+        import {mapState} from 'vuex'
+        const Counter = {
+            template: `<div>{{ count }}</div>`,
+            computed: {
+                count () {
+                    return this.$store.state.count
+                },
+                ...mapState({
+                    countPlusLocalState (state) {
+                        return state.count + this.localCount
+                    }
+
+                }),
+                ...mapGetters({
+                    // 把 `this.doneCount` 映射为 `this.$store.getters.doneTodosCount`
+                    // 作为 computed的 attribute 在这里不能使用 getters的 方法
+                    doneCount: 'doneTodosCount'
+                })
+            }
+        }
+    }
+
+},
+修改 vuex state:{
+    const store = new Vuex.Store({
+        state: {
+            count: 1
+        },
+        mutations: {
+            //mutation 必须是 同步函数  state是默认参数，playload 是传递参数
+            increment (state,playload) {
+                state.count+=playload.id
+            }
+        },
+        action:{
+            //action 可以是 异步 function default arguments is  context[与 store 实例具有相同方法和属性的 context 对象]
+            //
+            incrementAsync ({ commit },playload) {
+                setTimeout(() => {
+                commit('increment',playload)
+                }, 1000)
+            }
+
+        }
+
+    })
+
+    atomic update:{
+        使用 commite mutation[突变] update state. 
+        import {mapMutations} from 'vuex'
+        const Counter = {
+            template: `<div>{{ count }}</div>`,
+            methods:{
+                changeState:(id)=>{
+                    this.$store.commite('increment',{id:id})
+                },
+                ...mapMutations({
+                    change:'increment'
+                })
+            }
+        }
+    },
+    nonatomic update:{
+        使用 dispatch[派遣] action 触发 多个 atomic update
+
+        import {mapActions} from 'vuex'
+        const Counter = {
+            template: `<div>{{ count }}</div>`,
+            methods:{
+                changeState:(id)=>{
+                    this.$store.dispatch('incrementAsync',{id:id})
+                },
+                ...mapActions({
+                    incrementAsync:'incrementAsync'
+                })
+            }
+        }
+
+
+    }
+    
+
+}
+
+
