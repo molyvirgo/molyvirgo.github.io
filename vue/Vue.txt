@@ -1,0 +1,20 @@
+vue core{
+    how to monitor data
+    how to analysis template
+    how to render template to html
+
+}
+vue components{
+    async components： 只有这个组件在调用时才会加载该components
+}
+lifecycle function{
+    beforeDestory:
+}
+warning{
+    do not modify props data
+
+}
+unapprehensive{
+    .sync
+    slot
+}
